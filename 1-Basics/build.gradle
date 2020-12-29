@@ -1,0 +1,275 @@
+/**
+ * Groovy Basics
+ *
+ * to run this script just type:
+ *
+ *      gradle
+ *
+ */
+
+import java.text.SimpleDateFormat
+
+
+sayHelloWorld()
+println doubleValue(7)
+
+SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+sdf.setTimeZone(TimeZone.getTimeZone("UTC"))
+
+println "Hello World Now: " + sdf.format(new Date())
+
+void sayHelloWorld() {
+    println "Hello World From Method"
+}
+
+/**
+ * This method returns an Object(def)
+ */
+def doubleValue(int value) {
+    println "value: " + value
+    def result = value * 2 // the result is stored in the variable result which is then returned
+}
+
+
+/**
+ * Object in Groovy is def
+ * the use of def is like the use of Object when defining a type in Java
+ */
+Object dateJava = new Date()
+def dateGroovy = new Date()
+
+println "Date Object in Java:   " + dateJava
+println "Date Object in Groovy: " + dateGroovy
+
+/**
+Groovy is a Dynamic Language: Type Checking performed at Runtime
+ */
+
+/**
+    the following line only fails at runtime. Not at compilation time
+
+    printMessage(8)
+
+ */
+
+void printMessage(String message) {
+    println "message: " + message
+}
+
+
+
+/**
+Strings in Groovy:
+ */
+
+def s1 = "Hello double quotes!"
+def s2 = 'Hello single quotes!'
+
+def s3 = """
+        Multiple
+        Lines
+        In 
+        String
+"""
+println s3
+
+
+/**
+ * String Interpolation: $
+ * Only works with double quotes
+ */
+def x = 777
+println "The x value is $x"
+
+def gradleText = "Gradle Course"
+println "I am doing the ${gradleText.toUpperCase()}"
+
+/**
+ *
+ *  Properties in Groovy
+ *  Getters and Setters and implemented behind the scenes making the code less verbose
+ *
+ */
+
+class Person {
+    String name
+    Integer age
+    Person(name, age) {
+        this.name = name
+        this.age = age
+    }
+}
+
+def person1 = new Person("Oscar", 21)
+println "Age: ${person1.age}"
+person1.age = 40
+println "Age: ${person1.age}"
+
+
+Map map = new HashMap()
+
+map.put("one", "1")
+println "Map key one: ${map.get('one')}"
+
+/**
+ *  the key is treated as a property!!!
+ */
+map.two = "2"
+println "Map key two is treated as a property: ${map.two}"
+
+
+/**
+ *      Closures in Groovy
+ *      { }
+ *      ()
+ *      It is like a anonymous inner class in Java
+ */
+
+def myFirstClosure = {} // empty content in the closure
+
+println "My first closure does not do nothing: ${myFirstClosure()}" // needs the () to be executed
+/**
+ * The following 2 lines calls the toString() method
+ */
+println myFirstClosure
+println myFirstClosure.toString()
+
+def closure2 = {
+    println "From closure 2"
+    // this closure returns null
+}
+
+println "Closure 2: ${closure2()}"
+
+def closure3Print = { text ->
+    println text
+}
+
+closure3Print("Hello Closure 3")
+
+def closure4Print = { String text ->
+    println text
+}
+
+closure4Print("Hello Closure 4 with String parameter type")
+
+
+def closure5Print = { println it }
+
+closure5Print("Hello Closure 5 with implicit parameter (it)")
+
+
+def closure6Print = { a,b,c ->
+    println a
+    println b
+    println c
+    9
+}
+
+println closure6Print("     Hello", "       Closure 6", "       with 3 parameters. It returns also: ")
+
+Closure closure7Print = { println it}
+
+println closure7Print("Closure of type Closure that returns null")
+
+/**
+ *  Passing a Closure As parameter
+ *
+ */
+
+def method1(closure) {
+    // Execute the closure: closure()
+    closure() * 2
+}
+
+// the closure is:
+// {10}
+println method1 {10}
+
+
+def method2(factor, closure) {
+    // Execute the closure: closure()
+    closure() * factor
+}
+
+// the closure is:
+// {10}
+println method2(7, {10})
+
+
+for (int j in [1,2,3,4,5]) {
+    print j
+}
+println ""
+// common use of closure
+[1,2,3,4,5].each {print it}
+
+
+println ""
+
+/**
+ *  Closure Resolution
+ *
+ */
+
+class Actor {
+    String name = "Will"
+
+    Closure namePrinter = { println name }
+}
+
+def actor1 = new Actor()
+actor1.namePrinter()
+
+def theLastName = "Smith"
+
+def sayLastName = { println theLastName}
+
+sayLastName()
+
+theLastName = "Lee"
+
+/**
+ *
+ *  Closure Context
+ *
+ * In the execution of the second time of the Closure is done with the Context (Delegate) changed
+ *  It changed from Smith to Lee
+ */
+sayLastName()
+
+class Fruit {
+
+    String theName
+    Integer theAge
+
+    Fruit(name, age) {
+        this.theName = name
+        this.theAge = age
+    }
+
+    /**
+     *      Delegate Object in a Closure Groovy:
+     *      --------
+     *
+     *          Is the same as Owner,
+     *              but it is the only one that can be programmatically changed,
+     *                 and it is the one that makes Groovy closures really powerful!!!
+     *
+     *
+     */
+    def executeInside(Closure closure1) {
+        closure1.delegate = this
+        closure1()
+    }
+
+}
+
+def fruit1 = new Fruit("Appel", 10)
+
+/**
+ *  Changing the implementation of the class Fruit from out-side the class!
+ */
+fruit1.executeInside { println "The name $theName and the age $theAge " }
+
+

@@ -1,0 +1,74 @@
+
+/**
+ *      Properties
+ *
+ *          It can be predefined values like:
+ *
+ *              gradleVersion
+ *              gradleHomeDir
+ *
+ *          Or Objects like:
+ *
+ *              Script<Interface>   -------->   getLogger()
+ *
+ *
+ *      Gradle allows key-values in gradle.properties
+ *
+ */
+
+logger.info ">>>    This logguer object is part of the Script interface. To enable this log.info add the argument gradle -i: -i, --info Set log level to info."
+
+println ">>>    Accessing the gradle object through the delegate object project. Gradle gradleHomeDir: $gradle.gradleHomeDir "
+println ">>>    Accessing the gradle object through the delegate object project. Gradle gradleUserHomeDir: $gradle.gradleUserHomeDir "
+
+
+println ">>>    Has Property gradleVersion: ${project.gradle.hasProperty('gradleVersion')}"
+println ">>>    Has Property projectDir: ${hasProperty('projectDir')}"
+println ">>>    Has Property gradlePropertiesProp: ${hasProperty('gradlePropertiesProp')}"
+
+if (hasProperty('gradlePropertiesProp')) {
+    println ">>>    Property gradlePropertiesProp found automatically in the gradle.properties with the value: $gradlePropertiesProp "
+} else {
+    println ">>>    Property gradlePropertiesProp can not be found"
+}
+
+
+if (hasProperty('commandLineProp')) {
+    println ">>>    Property commandLineProp found in the command line with the value: $commandLineProp "
+} else {
+    println ">>>    Property commandLineProp can not be found. To set in command line: gradle -PcommandLineProp=commandLineValue"
+}
+
+
+/**
+ *
+ *  Property Extension
+ *
+ *      ExtraPropertiesExtension: https://docs.gradle.org/current/dsl/org.gradle.api.plugins.ExtraPropertiesExtension.html
+ *
+ *
+ *
+ */
+
+project.ext.sayHello1 = "Hello!!!"
+
+
+
+if (hasProperty('sayHello')) {
+    println ">>>    $sayHello"
+} else {
+    println ">>>    Property sayHello not found. We avoid a Run Time Exception"
+}
+
+import java.text.SimpleDateFormat
+project.ext.timestamp2 = {
+def df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+      df.setTimeZone(TimeZone.getTimeZone("UTC"))
+      return df.format(new Date())
+}
+
+if (hasProperty('timestamp2')) {
+    println ">>>    Property Closure: ${timestamp2()}"
+} else {
+    println ">>>    Property project.ext.timestamp2 not found."
+}

@@ -1,0 +1,62 @@
+/**
+ *	Gradle under the hood
+ *
+ * 	Gradle API: Object Model
+ * 	------------------------
+ *
+ * 	6 Key Interfaces:
+ *
+ *
+ * 		1.	Script:
+ * 		    -	it is implemented by all gradle scripts - file that ends with .gradle
+ * 		    -   implements cross cutting concerns
+ * 			-	https://docs.gradle.org/current/dsl/org.gradle.api.Script.html
+ * 		2.  Project:
+ * 	        -   it is associated with the build.gradle file
+ * 	    3.  Gradle:
+ * 	    4.  Settings:
+ * 	        -   related to multi-projects
+ * 	    5.  Task:
+ * 	    6.  Action:
+ */
+
+/**
+ * To run this we need to type
+ *      gradle -i
+ *      Where -i Sets the log level to info.
+ *      Check gradle --help
+ *
+ * logger object comes from Script interface which is implemented by this script
+ */
+logger.info "Hello!"
+
+
+apply { println "Hello from the method apply of the Script interface which receives as parameter this Closure"}
+
+
+/**
+ *      Gradle LifeCycle Phases
+ *
+ *      1.  Initialization
+ *              -   init.gradle + other.gradle
+ *                      This phase allows to set up properties based on the current environment
+ *                         It can also required DB authentication
+ *
+ *              -   settings.gradle
+ *                      Allows to handle multi-projects.
+ *                      Determines which projects to include in the build
+ *
+ *      2.  Configuration
+ *              -   This phase rely on the file:
+ *
+ *                      build.gradle
+ *
+ *
+ *      3.  Execution
+ *              -   This phase rely also on the file:
+ *
+ *                      build.gradle
+ *
+ *              -   Tasks are executed
+ *
+ */

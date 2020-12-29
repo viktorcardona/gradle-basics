@@ -1,0 +1,10 @@
+// to run this script
+// gradle hello
+// or
+// gradle
+
+defaultTasks 'hello'
+
+task ('hello').doLast {
+	println "Hello Gradle World"
+}

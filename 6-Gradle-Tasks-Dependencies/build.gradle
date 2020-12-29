@@ -1,0 +1,89 @@
+/**
+ *  Task Dependencies:
+ *
+ *      This is defined during the configuration phase
+ *      The tasks dependencies are defined in a Direct Acyclic Graph which can be accessed through the object:
+ *          -   project.gradle.taskGraph
+ *      There are some callback methods which are invoked:
+ *      -   whenReady: this method is called after the Direct Acyclic Graph is built
+ *      -   beforeTask: this method is called before each task is executed
+ *      -   afterTask: this method is called after each task is executed
+ */
+// Instead of specifying all the tasks to be executed we can use dependsOn
+// defaultTasks 'doStartProcess', 'doStep2', 'doInMiddle', 'doFinished'
+// and only specify one task:
+defaultTasks 'doFinished'
+
+/**
+ * dependsOn: 'doFinished' creates a cycle dependency graph then it fails to execute it is detected by Gradle
+ */
+task doStartProcess ( /*dependsOn: 'doFinished'*/ ) {
+    doLast {
+        println "$name Staring the process Ok"
+    }
+}
+
+// we can use the method dependsOn, check below, and remove the dependsOn from the task
+task doStep2 /*( dependsOn: 'doStartProcess' )*/ {
+    doLast {
+        println "$name Performed Step 2 Ok"
+    }
+}
+
+// we can filter the list of tasks that a task dependsOn
+task doInMiddle ( dependsOn: [ tasks.findAll {task -> task.name.startsWith("doStep2")} ] ) {
+    doLast {
+        println "$name Performed middle step Ok"
+    }
+}
+
+task doFinished ( dependsOn: ['doInMiddle'] ) {
+    doLast {
+        println "$name DONE! Ok with the version: $project.version "
+    }
+}
+
+/**
+ * set the dependency task(s) of the task doStep2 inside a conditional logic
+ */
+if (Math.random() < 0.5) {
+    doStep2.dependsOn doStartProcess
+    println "Step2 DOES depends on doStartProcess"
+} else {
+    println "Step2 DOES NOT depends on doStartProcess"
+}
+
+println ">>>>> Task Found: ${project.tasks.findAll {task -> task.name.startsWith("doStep2")}}"
+
+/**
+ *      Task Graph:
+ *          Direct Acyclic Graph
+ *          https://docs.gradle.org/current/javadoc/org/gradle/api/execution/TaskExecutionGraph.html
+ *
+ */
+
+println ">>>>> Task Graph: $project.gradle.taskGraph"
+
+/**
+ * All Task of the Tasks Graph
+ */
+project.gradle.taskGraph.whenReady {
+    println ">>>>> All Task Graph: $project.gradle.taskGraph.allTasks"
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.hasTask(doStartProcess)) {
+        project.version = '1.0' // in the doFinished task we are printing the final version
+    } else {
+        project.version = '1.0-SNAPSHOT' // in the doFinished task we are printing the final version
+    }
+    println ">>>>> All Task Graph: $project.gradle.taskGraph.allTasks"
+}
+
+project.gradle.taskGraph.beforeTask { task ->
+    println "+++ Before Task: $task.name"
+}
+
+gradle.taskGraph.afterTask { task ->
+    println "+++ After Task: $task.name"
+}

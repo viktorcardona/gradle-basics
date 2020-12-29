@@ -1,0 +1,98 @@
+
+/**
+ *
+ *      build.gradle = Project<Interface> -------- has a collection of ------> Task<Interface>
+ *
+ *          Task: Represents an atomic piece of work
+ *
+ *          Phases:
+ *
+ *              1.   Configuration Phase ---------> create Tasks - configure Tasks
+ *
+ *              2.   Execution Phase -------------> Execute Tasks
+ *
+ *
+ *
+ *          Tasks ------- is a collection of ---------------> Action<Interface>
+ *
+ *              Example of Tasks:
+ *
+ *                  -   Compiling classes
+ *                  -   Generating Java Doc
+ *
+ *          Task<Interface>:
+ *
+ *              -   https://docs.gradle.org/current/javadoc/org/gradle/api/Task.html
+ *
+ *              -   doFirst(action or closure): Task
+ *              -   doLast(action or closure): Task
+ *
+ *          Action<Interface>:
+ *
+ *              -   https://docs.gradle.org/current/javadoc/org/gradle/api/Action.html
+ *
+ *
+ *
+ */
+
+defaultTasks 'hello2'
+
+task hi // this is the Configuration Phase
+
+// we can access the task by using the project object
+project.hi.doLast{
+    println ">>>    Hi Task doLast method."
+}
+
+// execute the task:
+// gradle hi
+
+task hello {
+    description "This is the description of the hello task"
+    group "This is the group of the task hello"
+
+    doFirst {
+        println ">> hello.doFirst description: $description"
+    }
+
+    doLast {
+        println ">> hello.doLast description: $description"
+    }
+}
+
+println ">>>    hello.description: $hello.description"
+println ">>>    hello.group: $hello.group"
+
+// This add into the existing doLast method of the task some new lines to be executed
+// Adds the given closure to the end of this task's action list.
+hello.doLast {
+    println ">> hello.doLast ADDED.0 description: $description"
+}
+hello.doLast {
+    println ">> hello.doLast ADDED.1 description: $description"
+}
+
+// Adds the given closure to the beginning of this task's action list.
+hello.doFirst {
+    println ">> hello.doFirst ADDED.F-0 description: $description"
+}
+
+
+
+task hello2 {
+    description "Description Hello Task 2"
+    group "Group Hello Task 2"
+}
+
+// since the doFirst and doLast returns the Task itself we can chain actions
+
+hello2.doFirst {
+    println ">> hello2.doFirst: $description"
+}.doLast {
+    println ">> hello2.doLast.0: $group"
+}.doLast {
+    println ">> hello2.doLast.1: $group"
+}.doLast {
+    println ">> hello2.doLast.2: $group"
+}
+

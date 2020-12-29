@@ -1,0 +1,131 @@
+/**
+ *  We can specify initialization scripts which are executed before the build starts.
+ *  The initialization scripts allows for instance:
+ *      -   Define machine specific details, such as where JDKs are installed.
+ *      -   Set up general properties
+ *
+ *  One way to configure those scripts based on the documentation:
+ *  https://docs.gradle.org/current/userguide/init_scripts.html
+ *  is to use the flag:
+ *  --init-script <path-to-gradle-file>
+ *  we can add as many flags as initialization files we have
+ *
+ *  Another simple way is to copy the scripts into the folder GRADLE_HOME/init.d/
+ */
+
+println "build.gradle..........executed... timestamp @ ${gradle.timestamp()} "
+
+/**
+ * The gradle.timestamp() property was defined in the initialization script:
+ * USER_HOME/.gradle/init.d/init.gradle:
+ *
+ * import java.text.*
+ *
+ * gradle.ext.timestamp = {
+ *      def df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+ *      df.setTimeZone(TimeZone.getTimeZone("UTC"))
+ *      return df.format(new Date())
+ * }
+ *
+ * The gradle.ext.timestamp is a Closure that is why we executed as timestamp()
+ * gradle is an object from the Gradle interface https://docs.gradle.org/current/dsl/org.gradle.api.invocation.Gradle.html
+ * Take a look to the Object Gradle Model below
+ */
+
+
+/**
+ *
+ *      Object Gradle Model
+ *      -------------------
+ *
+ *      File                    Phase
+ *      build.gradle            Configuration
+ *
+ *          -   Implements the Script interface https://docs.gradle.org/current/dsl/org.gradle.api.Script.html
+ *          -   In fact, every .gradle file implements the Script interface
+ *          -   The .gradle file has access to a set of properties and methods due to the Script interface
+ *          -   The .gradle file also has access to the Delegates object
+ *          -   The Delegates object depends on the lifecycle phase that is being executed
+ *          -   If we are in the Configuration phase (build.gradle file) then the Delegates object is the project which implements the Project interface
+ *          -   The Project interface https://docs.gradle.org/current/dsl/org.gradle.api.Project.html
+ *
+ *          Summary:
+ *          --------
+ *
+ *              build.gradle = Script + Project
+ *
+ *              Note: Project object has access to a Gradle object
+ *
+ *      File                    Phase
+ *      settings.gradle         Initialization
+ *
+ *          -   This script file is used when we are working with a Multi-Project build application
+ *          -   In this case the script also implements the Script interface, but
+ *          -   The delegates object is in this case is a settings object
+ *          -   The settings object implements the interface https://docs.gradle.org/current/dsl/org.gradle.api.initialization.Settings.html
+ *          -   The settings object has a reference to a collection of projects
+ *
+ *          Summary:
+ *          --------
+ *
+ *              settings.gradle = Script + Settings
+ *
+ *              Note: Settings object has access to a Gradle object
+ *
+ *
+ *      File                    Phase
+ *      init.gradle             Initialization
+ *
+ *          -   This are the scripts file which are executed during the Initialization phase
+ *          -   Take a look at the beginning of this file to know where the initialization scripts are located
+ *          -   In this case the script also implements the Script interface, but
+ *          -   The delegates object is in this case is a gradle object, this is because at this stage gradle do not know about any project yet
+ *          -   https://docs.gradle.org/current/dsl/org.gradle.api.invocation.Gradle.html
+ *
+ *          Summary:
+ *          --------
+ *
+ *              init.gradle = Script + Gradle
+ *
+ *
+ */
+
+
+logger.info ">>>    This logguer object is part of the Script interface. To enable this log.info add the argument gradle -i: -i, --info Set log level to info."
+
+println ">>>    Accessing the gradle object through the delegate object project. Gradle Version: ${gradle.getGradleVersion()} We can also use the property: ${gradle.gradleVersion} "
+println ">>>    Accessing the gradle object through the delegate object project. Gradle gradleHomeDir: $gradle.gradleHomeDir "
+println ">>>    Accessing the gradle object through the delegate object project. Gradle gradleUserHomeDir: $gradle.gradleUserHomeDir "
+
+
+/**
+ * Project Object:
+ *
+ *  Remember it is the delegate object for the build.gradle
+ *  https://docs.gradle.org/current/dsl/org.gradle.api.Project.html
+ *
+ */
+
+println ">>>    buildDir: $buildDir"
+println ">>>    buildFile: $buildFile"
+println ">>>    relativePath(buildFile): ${relativePath(buildFile)}"
+
+println """
+***********************************************************************
+Multiline Quiz Example:
+
+1.  What are the 3 phases of the Gradle Lifecycle?
+
+    -   Initialization, Configuration, Execution
+
+
+2.  What are the main Domain Objects used by the Gradle Lifecycle?
+
+    -   Script, Gradle, Project, Settings
+***********************************************************************
+"""
+
+
+
+
+
