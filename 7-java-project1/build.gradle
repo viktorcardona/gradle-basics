@@ -1,0 +1,95 @@
+/**
+ * We want to extends the gradle core with the java plugin:
+ *
+ *  - Documentation:
+ *    - https://docs.gradle.org/current/userguide/java_plugin.html
+ *
+ *  - To list the tasks available type:
+ *    - gradle tasks
+ *
+ *  - Building the Application:
+ *
+ *    - Clean the app:
+ *
+ *      - gradle clean
+ *
+ *    - Build the app:
+ *
+ *      - gradle build
+ *
+ *    - Generate the Java Docs:
+ *
+ *      - gradle javadoc
+ *
+ *
+ *
+ */
+plugins {
+  id 'java'
+}
+
+repositories {
+  delegate.mavenCentral()
+}
+
+project.group = "gradle.com.basics"
+project.version = '0.0.1-SNAPSHOT'
+
+dependencies {
+
+  implementation 'org.apache.commons:commons-lang3:3.11'
+
+  testImplementation 'junit:junit:4.13.1'
+
+}
+
+
+jar {
+  /**
+   *  jar is one of the tasks of the java plugin:
+   *
+   *    https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar
+   *
+   */
+
+  /**
+   * Sets the jar file name:
+   */
+  archiveBaseName = "$project.name-all"
+
+  /**
+   * Sets manifest file contents:
+   */
+  manifest {
+    attributes  'Implementation-Title': 'Gradle Jar File Example',
+                'Implementation-Version': project.version,
+                'Created-By' : "gradle.basics",
+                'Main-Class': 'gradle.basics.Application'
+  }
+
+  println ">>>  archiveBaseName: $archiveBaseName"
+  println ">>>  archiveVersion: $archiveVersion"
+  println ">>>  project.version: $project.version"
+  println ">>>  manifest.attributes: $manifest.attributes"
+  println ">>>  project.configurations.runtimeClasspath: $project.configurations.runtimeClasspath"
+  println project.configurations.runtimeClasspath.collect()
+  /**
+   * Lists all dependencies of the project:
+   *  - gradle dependencies
+   *    From this command we get:
+   *
+   *          runtimeClasspath - Runtime classpath of source set 'main'.
+   *          \--- org.apache.commons:commons-math3:3.6.1
+   *
+   *    Then, the runtimeClasspath values can be accessed by:
+   *
+   *        - $project.configurations.runtimeClasspath
+   */
+
+  /**
+   * Add the unzip contents of the dependencies into the jar file:
+   */
+  from {
+    project.configurations.runtimeClasspath.collect {File file -> project.zipTree(file) }
+  }
+}
