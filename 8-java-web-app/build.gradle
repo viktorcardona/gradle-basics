@@ -1,0 +1,88 @@
+/**
+ *
+ * WAR
+ *
+ * Clean and Build Type:
+ *
+ * 	-	gradle clean build
+ *
+ * Deploy to Tomcat type:
+ *
+ * 	-	gradle deployWebAppInTomcat
+ *
+ * Test the app:
+ *
+ * 	-	http://localhost:8080/greeter-app
+ * 	-	http://localhost:8080/greeter-app/greet
+ *
+ * Documentation:
+ *
+ * 		-	Task:
+ *
+ * 				https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.War.html
+ *
+ * 		-	Plugin:
+ *
+ * 				https://docs.gradle.org/current/userguide/war_plugin.html
+ *
+ */
+plugins {
+  id 'java'
+  id 'war'
+}
+
+
+
+group = 'gradle.basics'
+version = '0.0.1-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+war {
+	archiveFileName = 'greeter-app.war'
+}
+
+repositories{
+	mavenCentral()
+}
+
+/**
+ * https://docs.gradle.org/current/dsl/org.gradle.api.tasks.Copy.html
+ *
+ * In this case we are saying that our new task deployToTomcat be of type Copy
+ *		It is like inheritance in Java
+ *		The new task now have access to the public methods and properties of the Copy task
+ */
+ext.tomcatHome = '/software/apache-tomcat-9.0.8'
+ext.tomcatWebappsFolder = "$tomcatHome/webapps"
+
+
+task deployWebAppInTomcat(type: Copy, dependsOn: 'war') {
+	from war.archiveFile
+    into "$tomcatWebappsFolder"
+}
+
+dependencies { 
+
+	implementation ('org.springframework:spring-webmvc:4.0.3.RELEASE') {
+	}
+
+	implementation 'javax.inject:javax.inject:1'
+
+	implementation 'org.apache.commons:commons-math3:3.2'
+	implementation 'org.projectlombok:lombok:1.18.16'
+	implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.0'
+
+	implementation 'jstl:jstl:1.2'
+
+	compileOnly "javax.servlet:javax.servlet-api:3.0.1"
+	testImplementation	'junit:junit:4.11'
+
+	//LOMBOK Dependencies
+	annotationProcessor 'org.projectlombok:lombok:1.18.16'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.16'
+
+}
+
+
