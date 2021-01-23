@@ -1,0 +1,56 @@
+/**
+ * This is the root build.gradle file
+ */
+
+subprojects {
+
+    /**
+     * The following configuration applies for every sub-project
+     */
+
+    apply plugin: 'java'
+
+    group = 'com.gradle.basics'
+    version = '0.0.1-SNAPSHOT'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+    }
+
+}
+
+project(':sub-project-1') {
+    dependencies {
+        implementation 'org.apache.commons:commons-math3:3.2'
+        implementation 'org.apache.logging.log4j:log4j-core:2.5'
+        testImplementation  "junit:junit:4.12"
+    }
+}
+
+project(':sub-project-2') {
+    dependencies {
+        implementation project(':sub-project-3')
+    }
+}
+
+project(':sub-project-3') {
+
+    /**
+     * API Scope:
+     *
+     *      This plugin gives access to its clients (sub-project-2) to
+     *          the implementation of this library but also give access to the dependencies marked as
+     *          -api-. In this example sub-project-2 has access to this project but also to the
+     *          transitive dependency which is commons-math3:3.2
+     */
+    apply plugin: 'java-library'
+
+    dependencies {
+        api 'org.apache.commons:commons-math3:3.2'
+        implementation 'org.apache.logging.log4j:log4j-core:2.5'
+        testImplementation  "junit:junit:4.12"
+    }
+}

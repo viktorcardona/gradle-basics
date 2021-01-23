@@ -1,0 +1,10 @@
+/**
+ * This file is mandatory for multi-projects:
+ *  -   Instantiates all sub projects objects
+ */
+
+include 'sub-project-1', 'sub-project-2', 'sub-project-3'
+
+rootProject.name = 'first-gradle-multi-project'
+
+
